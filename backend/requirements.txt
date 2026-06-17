@@ -12,3 +12,4 @@ opencv-python-headless==4.10.0.84
 insightface==0.7.3
 pillow==10.4.0
 python-dotenv==1.0.1
+requests>=2.31.0

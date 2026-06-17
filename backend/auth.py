@@ -15,6 +15,7 @@ JWT_EXPIRE_HOURS = int(os.getenv('JWT_EXPIRE_HOURS', '24'))
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 security = HTTPBearer()
+security_optional = HTTPBearer(auto_error=False)
 
 
 def hash_password(password: str) -> str:
@@ -46,3 +47,15 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
     if not user:
         raise HTTPException(status_code=401, detail='User not found')
     return user
+
+
+def get_optional_user(credentials: HTTPAuthorizationCredentials = Depends(security_optional)):
+    """Returns the authenticated user or None if no valid token is provided."""
+    if credentials is None:
+        return None
+    try:
+        payload = jwt.decode(credentials.credentials, JWT_SECRET, algorithms=[JWT_ALG])
+        user_id = int(payload.get('sub'))
+    except (JWTError, ValueError):
+        return None
+    return db.fetch_one('SELECT id, name, email FROM users WHERE id = %s', [user_id])

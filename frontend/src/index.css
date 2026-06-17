@@ -2,6 +2,155 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  color-scheme: dark;
+@layer base {
+  :root {
+    color-scheme: dark;
+    --brand-rgb: 124, 58, 237;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background-color: rgba(124, 58, 237, 0.3);
+    color: #f8fafc;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.2);
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.35);
+  }
+
+  /* Reset inputs to match dark theme */
+  input,
+  textarea,
+  select {
+    @apply bg-surface-800 border-surface-700 text-surface-100 placeholder-surface-500;
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    @apply outline-none ring-2 ring-brand-500/40 border-brand-500/50;
+  }
+}
+
+@layer components {
+  /* Glassmorphism cards */
+  .glass-card {
+    @apply bg-surface-900/60 border border-surface-700/50 rounded-2xl backdrop-blur-xl shadow-inner-glow;
+  }
+
+  .glass-card-hover {
+    @apply glass-card transition-all duration-300;
+  }
+
+  .glass-card-hover:hover {
+    @apply border-brand-500/30 shadow-glow-sm bg-surface-900/80;
+    transform: translateY(-2px);
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-400 via-brand-300 to-purple-300;
+  }
+
+  /* Primary button */
+  .btn-primary {
+    @apply px-5 py-2.5 rounded-xl font-medium text-sm
+           bg-gradient-to-r from-brand-600 to-brand-500
+           hover:from-brand-500 hover:to-brand-400
+           shadow-glow-sm hover:shadow-glow
+           transition-all duration-300
+           active:scale-[0.97]
+           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none;
+  }
+
+  /* Secondary / ghost button */
+  .btn-secondary {
+    @apply px-5 py-2.5 rounded-xl font-medium text-sm
+           bg-surface-800/80 border border-surface-700/60 text-surface-200
+           hover:bg-surface-700/80 hover:border-surface-600
+           transition-all duration-300
+           active:scale-[0.97];
+  }
+
+  /* Danger button */
+  .btn-danger {
+    @apply px-4 py-2 rounded-xl font-medium text-sm
+           text-red-400 border border-red-500/20
+           hover:bg-red-500/10 hover:border-red-500/40
+           transition-all duration-300;
+  }
+
+  /* Input field */
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl
+           bg-surface-800/60 border border-surface-700/60
+           text-surface-100 placeholder-surface-500
+           focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500/50
+           transition-all duration-200;
+  }
+
+  /* Skeleton shimmer */
+  .skeleton {
+    @apply bg-gradient-to-r from-surface-800 via-surface-700/60 to-surface-800
+           bg-[length:200%_100%] animate-shimmer rounded-xl;
+  }
+
+  /* Hero background glow */
+  .hero-glow {
+    position: relative;
+  }
+
+  .hero-glow::before {
+    content: '';
+    position: absolute;
+    top: -40%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120%;
+    height: 80%;
+    background: radial-gradient(
+      ellipse 60% 50% at 50% 50%,
+      rgba(124, 58, 237, 0.12),
+      rgba(124, 58, 237, 0.04) 40%,
+      transparent 70%
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Progress bar fill animation */
+  .progress-fill {
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    @apply bg-gradient-to-r from-brand-600 to-brand-400;
+  }
+
+  /* Stagger animation delay utilities */
+  .stagger-1 { animation-delay: 0.05s; }
+  .stagger-2 { animation-delay: 0.1s; }
+  .stagger-3 { animation-delay: 0.15s; }
+  .stagger-4 { animation-delay: 0.2s; }
+  .stagger-5 { animation-delay: 0.25s; }
+  .stagger-6 { animation-delay: 0.3s; }
 }

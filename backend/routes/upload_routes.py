@@ -2,15 +2,15 @@ import os
 import shutil
 import uuid
 import asyncio
-import cv2
-import numpy as np
+import logging
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from ..auth import get_current_user
 from .. import db
 from ..s3 import upload_file
-from ..face_engine import get_embeddings
+from ..face_engine import get_embeddings, load_image
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 ALLOWED_TYPES = {'image/jpeg', 'image/png', 'image/webp'}
 TEMP_DIR = os.path.join(os.path.dirname(__file__), '..', 'temp_uploads')
@@ -30,11 +30,8 @@ def _save_temp(file: UploadFile) -> str:
     return temp_path
 
 
-def _load_image(path: str) -> np.ndarray:
-    img = cv2.imread(path)
-    if img is None:
-        raise ValueError('Invalid image file')
-    return img
+def _load_image(path: str):
+    return load_image(path)
 
 
 @router.post('/upload-event-photos/{event_id}')
@@ -57,12 +54,7 @@ async def upload_event_photos(
 
         temp_path = _save_temp(file)
         filename = os.path.basename(file.filename or temp_path)
-        s3_key = f"events/{event_id}/{filename}"
-
-        existing = db.fetch_one('SELECT id FROM photos WHERE event_id = %s AND image_url LIKE %s', [event_id, f"%/{s3_key}"])
-        if existing:
-            os.remove(temp_path)
-            continue
+        s3_key = f"events/{event_id}/{uuid.uuid4().hex}_{filename}"
 
         try:
             image_url = await asyncio.to_thread(upload_file, temp_path, s3_key)
@@ -70,12 +62,14 @@ async def upload_event_photos(
             if os.path.exists(temp_path):
                 os.remove(temp_path)
             raise HTTPException(status_code=500, detail=str(exc)) from exc
+
         photo = db.execute(
             'INSERT INTO photos (event_id, image_url) VALUES (%s, %s) RETURNING id, image_url',
             [event_id, image_url],
             returning=True,
         )
 
+        face_count = 0
         try:
             img = await asyncio.to_thread(_load_image, temp_path)
             faces = await asyncio.to_thread(get_embeddings, img)
@@ -85,12 +79,18 @@ async def upload_event_photos(
                     'INSERT INTO face_embeddings (photo_id, embedding) VALUES (%s, %s)',
                     [photo['id'], emb],
                 )
+                face_count += 1
         except Exception as exc:
-            raise HTTPException(status_code=500, detail=f"Face processing failed: {exc}") from exc
+            # Non-blocking: log warning but don't fail the upload
+            logger.warning('Face processing failed for photo %s: %s', photo['id'], exc)
         finally:
             if os.path.exists(temp_path):
                 os.remove(temp_path)
 
-        uploaded.append({'photo_id': photo['id'], 'image_url': photo['image_url']})
+        uploaded.append({
+            'photo_id': photo['id'],
+            'image_url': photo['image_url'],
+            'face_count': face_count,
+        })
 
     return {'uploaded': uploaded}

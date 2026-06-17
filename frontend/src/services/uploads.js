@@ -1,4 +1,4 @@
-import api from './api';
+import api, { apiPublic } from './api';
 
 export async function uploadEventPhotos(eventId, files, onProgress) {
   const form = new FormData();
@@ -18,6 +18,15 @@ export async function findMe(eventId, file) {
   const form = new FormData();
   form.append('file', file);
   const { data } = await api.post(`/find-me/${eventId}`, form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return data;
+}
+
+export async function findMePublic(token, file) {
+  const form = new FormData();
+  form.append('file', file);
+  const { data } = await apiPublic.post(`/find-me/share/${token}`, form, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
   return data;

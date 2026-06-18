@@ -81,7 +81,7 @@ async def find_me(
             raise HTTPException(status_code=400, detail='No face detected in the uploaded image')
 
         emb = face['embedding'].tolist()
-        threshold = float(os.getenv('SIMILARITY_THRESHOLD', '0.35'))
+        threshold = float(os.getenv('SIMILARITY_THRESHOLD', '0.6'))
         matches = _search_faces(emb, event_id, threshold)
         return {'matches': matches}
     finally:
@@ -115,7 +115,7 @@ async def find_me_public(
             raise HTTPException(status_code=400, detail='No face detected in the uploaded image')
 
         emb = face['embedding'].tolist()
-        threshold = float(os.getenv('SIMILARITY_THRESHOLD', '0.35'))
+        threshold = float(os.getenv('SIMILARITY_THRESHOLD', '0.6'))
         matches = _search_faces(emb, event_id, threshold)
         return {'matches': matches}
     finally:

@@ -31,21 +31,23 @@ export default function Lightbox({ images, initialIndex = 0, onClose }) {
   }, [close, goNext, goPrev]);
 
   const handleDownload = async () => {
-    if (!current?.url) return;
+    if (!current) return;
+    const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000';
     try {
-      const res = await fetch(current.url, { mode: 'cors' });
-      if (!res.ok) throw new Error('fetch failed');
+      // Use backend proxy to bypass S3 CORS restrictions
+      const res = await fetch(`${apiBase}/photos/${current.photoId}/download`);
+      if (!res.ok) throw new Error('proxy failed');
       const blob = await res.blob();
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = current.filename || `photo-${index + 1}.jpg`;
+      a.download = current.filename || `grabpic-photo-${index + 1}.jpg`;
       document.body.appendChild(a);
       a.click();
       a.remove();
       URL.revokeObjectURL(a.href);
     } catch {
-      // Fallback: open in new tab for manual save (CORS-blocked S3 URLs)
-      window.open(current.url, '_blank');
+      // Fallback: open in new tab for manual save
+      if (current.url) window.open(current.url, '_blank');
     }
   };
 

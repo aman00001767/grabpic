@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import UploadZone from '../components/UploadZone.jsx';
+import SelfieInput from '../components/SelfieInput.jsx';
 import PhotoGrid from '../components/PhotoGrid.jsx';
 import EmptyState from '../components/EmptyState.jsx';
 import LoadingSpinner from '../components/LoadingSpinner.jsx';
@@ -33,8 +34,9 @@ export default function GuestSearch() {
     })();
   }, [token]);
 
-  const handleSelfie = async (files) => {
-    const file = files[0];
+  const handleSelfie = async (fileOrFiles) => {
+    // Accept either a single File (from SelfieInput) or a FileList/array
+    const file = fileOrFiles instanceof File ? fileOrFiles : fileOrFiles?.[0];
     if (!file) return;
     setSearching(true);
     setMatches([]);
@@ -104,7 +106,7 @@ export default function GuestSearch() {
           )}
         </div>
 
-        {/* Selfie upload */}
+        {/* Selfie input */}
         <div className="max-w-md mx-auto mb-10 animate-fade-in-up" style={{ animationDelay: '0.2s', opacity: 0 }}>
           {searching ? (
             <div className="py-16">
@@ -112,13 +114,7 @@ export default function GuestSearch() {
             </div>
           ) : (
             <>
-              <UploadZone
-                onFiles={handleSelfie}
-                multiple={false}
-                label="Upload a Selfie"
-                sublabel="Take a clear photo of your face to find your event photos"
-                icon="selfie"
-              />
+              <SelfieInput onFile={handleSelfie} />
               <p className="text-xs text-surface-500 text-center mt-3">
                 Your photo is processed securely and not stored.
               </p>

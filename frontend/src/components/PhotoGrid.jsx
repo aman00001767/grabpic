@@ -7,7 +7,8 @@ export default function PhotoGrid({ photos = [], showDistance = false, onSelect,
   const lightboxImages = photos.map((p) => ({
     url: p.display_url || p.image_url,
     alt: `Photo ${p.photo_id || p.id}`,
-    filename: `photo-${p.photo_id || p.id}.jpg`,
+    filename: `grabpic-photo-${p.photo_id || p.id}.jpg`,
+    photoId: p.photo_id || p.id,
   }));
 
   const handleDownload = async (e, photo) => {

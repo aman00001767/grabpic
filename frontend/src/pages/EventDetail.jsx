@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import Navbar from '../components/Navbar.jsx';
 import UploadZone from '../components/UploadZone.jsx';
+import SelfieInput from '../components/SelfieInput.jsx';
 import PhotoGrid from '../components/PhotoGrid.jsx';
 import SkeletonCard from '../components/SkeletonCard.jsx';
 import EmptyState from '../components/EmptyState.jsx';
@@ -79,8 +80,9 @@ export default function EventDetail() {
     }
   };
 
-  const handleSelfie = async (files) => {
-    const file = files[0];
+  const handleSelfie = async (fileOrFiles) => {
+    // Accept either a single File (from SelfieInput) or a FileList/array
+    const file = fileOrFiles instanceof File ? fileOrFiles : fileOrFiles?.[0];
     if (!file) return;
     setSearching(true);
     setMatches([]);
@@ -336,18 +338,7 @@ export default function EventDetail() {
                   <LoadingSpinner size="lg" text="Searching for your face..." />
                 </div>
               ) : (
-                <>
-                  <UploadZone
-                    onFiles={handleSelfie}
-                    multiple={false}
-                    label="Upload a Selfie"
-                    sublabel="Take a clear photo of your face to find matching event photos"
-                    icon="selfie"
-                  />
-                  <p className="text-xs text-surface-500 text-center mt-3">
-                    For best results, use a well-lit, front-facing photo.
-                  </p>
-                </>
+                <SelfieInput onFile={handleSelfie} />
               )}
             </div>
           )}

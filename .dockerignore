@@ -8,6 +8,7 @@ node_modules
 frontend/dist
 backend/temp_uploads
 backend/.env
+.env.production
 *.log
 .DS_Store
 .vscode

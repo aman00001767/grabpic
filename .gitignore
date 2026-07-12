@@ -38,6 +38,7 @@ backend/.env.example
 frontend/.env
 .env
 *.env
+.env.production
 
 # OS
 .DS_Store

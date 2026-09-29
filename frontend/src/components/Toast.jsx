@@ -58,27 +58,27 @@ export function ToastProvider({ children }) {
 const typeStyles = {
   success: {
     border: 'border-emerald-500/30',
-    bg: 'bg-emerald-500/10',
+    accent: 'bg-emerald-500/15',
     icon: (
-      <svg className="w-4.5 h-4.5 text-emerald-400" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+      <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
       </svg>
     ),
   },
   error: {
     border: 'border-red-500/30',
-    bg: 'bg-red-500/10',
+    accent: 'bg-red-500/15',
     icon: (
-      <svg className="w-4.5 h-4.5 text-red-400" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+      <svg className="w-4 h-4 text-red-400" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
       </svg>
     ),
   },
   info: {
-    border: 'border-brand-500/30',
-    bg: 'bg-brand-500/10',
+    border: 'border-terracotta/30',
+    accent: 'bg-terracotta/10',
     icon: (
-      <svg className="w-4.5 h-4.5 text-brand-400" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+      <svg className="w-4 h-4 text-terracotta" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
       </svg>
     ),
@@ -94,17 +94,17 @@ function ToastContainer({ toasts, onDismiss }) {
           <div
             key={t.id}
             className={`
-              pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl
+              pointer-events-auto flex items-center gap-3 px-4 py-3
               border backdrop-blur-xl shadow-lg
-              bg-surface-900/90 ${style.border}
+              bg-surface/95 ${style.border}
               ${t.exiting ? 'animate-toast-out' : 'animate-toast-in'}
               max-w-sm
             `}
           >
-            <div className={`flex-shrink-0 p-1 rounded-lg ${style.bg}`}>{style.icon}</div>
-            <p className="text-sm text-surface-200 flex-1">{t.message}</p>
+            <div className={`flex-shrink-0 p-1 ${style.accent}`}>{style.icon}</div>
+            <p className="font-sans text-sm text-sand flex-1">{t.message}</p>
             <button
-              className="flex-shrink-0 text-surface-500 hover:text-surface-300 transition-colors"
+              className="flex-shrink-0 text-muted hover:text-terracotta transition-colors"
               onClick={() => onDismiss(t.id)}
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">

@@ -11,13 +11,15 @@ export default function LoadingSpinner({ size = 'md', text = '' }) {
     <div className="flex flex-col items-center justify-center gap-3">
       <div className="relative">
         <div
-          className={`${sizes[size]} rounded-full border-2 border-surface-700 border-t-brand-500 animate-spin`}
+          className={`${sizes[size]} rounded-full border-2 border-outline-variant border-t-terracotta animate-spin`}
         />
         <div
-          className={`absolute inset-0 ${sizes[size]} rounded-full border-2 border-transparent border-b-brand-400/30 animate-spin-slow`}
+          className={`absolute inset-0 ${sizes[size]} rounded-full border-2 border-transparent border-b-ochre/30 animate-spin-slow`}
         />
       </div>
-      {text && <p className="text-sm text-surface-400 animate-pulse">{text}</p>}
+      {text && (
+        <p className="font-space text-[11px] tracking-widest uppercase text-muted animate-pulse">{text}</p>
+      )}
     </div>
   );
 }

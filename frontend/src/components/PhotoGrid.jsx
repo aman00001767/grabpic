@@ -16,7 +16,6 @@ export default function PhotoGrid({ photos = [], showDistance = false, onSelect,
     const photoId = photo.photo_id || photo.id;
     const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000';
     try {
-      // Use backend proxy to bypass S3 CORS restrictions
       const res = await fetch(`${apiBase}/photos/${photoId}/download`);
       if (!res.ok) throw new Error('proxy failed');
       const blob = await res.blob();
@@ -28,7 +27,6 @@ export default function PhotoGrid({ photos = [], showDistance = false, onSelect,
       a.remove();
       URL.revokeObjectURL(a.href);
     } catch {
-      // Fallback: open presigned URL in new tab
       const url = photo.display_url || photo.image_url;
       if (url) window.open(url, '_blank');
     }
@@ -36,7 +34,7 @@ export default function PhotoGrid({ photos = [], showDistance = false, onSelect,
 
   return (
     <>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-px bg-outline-variant">
         {photos.map((photo, idx) => {
           const url = photo.display_url || photo.image_url;
           const photoId = photo.photo_id || photo.id;
@@ -46,29 +44,29 @@ export default function PhotoGrid({ photos = [], showDistance = false, onSelect,
             <div
               key={`${photoId}-${idx}`}
               className={`
-                group relative glass-card overflow-hidden cursor-pointer
-                transition-all duration-300 hover:shadow-glow-sm
-                ${isSelected ? 'ring-2 ring-brand-500 border-brand-500/50' : ''}
+                group relative bg-espresso overflow-hidden cursor-pointer
+                transition-all duration-300
+                ${isSelected ? 'ring-2 ring-inset ring-terracotta' : ''}
               `}
               onClick={() => setLightboxIndex(idx)}
             >
               <img
                 src={url}
                 alt={`Photo ${photoId}`}
-                className="w-full h-44 object-cover transition-transform duration-500 group-hover:scale-105"
+                className="w-full h-44 object-cover transition-transform duration-500 group-hover:scale-105 grayscale-[10%] contrast-[1.05]"
                 loading="lazy"
               />
 
-              {/* Hover overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              {/* Hover overlay — warm editorial gradient */}
+              <div className="absolute inset-0 bg-gradient-to-t from-espresso/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <div className="absolute bottom-0 left-0 right-0 p-3 flex items-center justify-between">
                   {showDistance && photo.distance != null && (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/30">
+                    <span className="font-space text-[10px] tracking-widest uppercase px-2 py-0.5 bg-terracotta/20 text-terracotta border border-terracotta/30">
                       {Math.max(0, Math.round((1 - photo.distance) * 100))}% match
                     </span>
                   )}
                   <button
-                    className="p-1.5 rounded-lg bg-surface-800/80 hover:bg-surface-700 text-surface-300 hover:text-white transition-colors ml-auto"
+                    className="p-1.5 bg-espresso/80 border border-outline-variant hover:border-terracotta text-muted-darker hover:text-sand transition-colors ml-auto"
                     onClick={(e) => handleDownload(e, photo)}
                     title="Download"
                   >
@@ -82,8 +80,8 @@ export default function PhotoGrid({ photos = [], showDistance = false, onSelect,
               {/* Checkbox for selectable mode */}
               {selectable && (
                 <button
-                  className={`absolute top-2 right-2 w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all duration-200
-                    ${isSelected ? 'bg-brand-500 border-brand-500' : 'border-surface-400/50 bg-surface-800/50 opacity-0 group-hover:opacity-100'}
+                  className={`absolute top-2 right-2 w-6 h-6 border-2 flex items-center justify-center transition-all duration-200
+                    ${isSelected ? 'bg-terracotta border-terracotta' : 'border-muted/50 bg-espresso/50 opacity-0 group-hover:opacity-100'}
                   `}
                   onClick={(e) => {
                     e.stopPropagation();

@@ -1,50 +1,69 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,jsx}'],
+  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        // Stitch design system fonts
+        display: ["'DM Serif Display'", 'serif'],
+        space: ["'Space Grotesk'", 'sans-serif'],
+        sans: ["'Inter'", 'sans-serif'],
       },
       colors: {
-        brand: {
-          50: '#f3f0ff',
-          100: '#e9e3ff',
-          200: '#d4c8ff',
-          300: '#b49dff',
-          400: '#9466ff',
-          500: '#7c3aed',
-          600: '#6d28d9',
-          700: '#5b21b6',
-          800: '#4c1d95',
-          900: '#3b0e7a',
-          950: '#1e0a3e',
-        },
+        // Stitch warm editorial palette
+        espresso: '#120d0a',
         surface: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          850: '#172032',
-          900: '#0f172a',
-          950: '#020617',
+          DEFAULT: '#1a130f',
+          container: '#241a14',
+          'container-low': '#18110d',
+          'container-lowest': '#0d0907',
+          'container-high': '#31231b',
+          'container-highest': '#3f2e24',
         },
+        outline: '#6d5242',
+        'outline-variant': '#3d2b20',
+        terracotta: {
+          DEFAULT: '#e0533c',
+          container: '#c4422c',
+          fixed: '#ff8773',
+          'fixed-dim': '#f87157',
+          dark: '#8f3627',
+        },
+        ochre: {
+          DEFAULT: '#f59e0b',
+          container: '#633905',
+          dim: '#d4860a',
+        },
+        sand: '#fdf8f0',
+        bronze: '#3d2b20',
+        // Muted text tones from the design
+        'on-surface': '#fdf8f0',
+        'on-surface-variant': '#d6c7bc',
+        'muted': '#bfaea4',
+        'muted-deep': '#b89e8f',
+        'muted-darker': '#cbb8ad',
       },
       backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'hero-glow': 'radial-gradient(ellipse 80% 60% at 50% -20%, rgba(124, 58, 237, 0.25), transparent)',
-        'card-shine': 'linear-gradient(115deg, transparent 30%, rgba(124, 58, 237, 0.08) 50%, transparent 70%)',
+        'hero-glow': 'radial-gradient(ellipse 80% 60% at 50% -20%, rgba(224, 83, 60, 0.12), transparent)',
+        'card-warm': 'linear-gradient(115deg, transparent 30%, rgba(224, 83, 60, 0.05) 50%, transparent 70%)',
+        'gradient-down': 'linear-gradient(to bottom, #18110d, #120d0a)',
       },
       boxShadow: {
-        'glow': '0 0 20px -5px rgba(124, 58, 237, 0.35)',
-        'glow-lg': '0 0 40px -10px rgba(124, 58, 237, 0.4)',
-        'glow-sm': '0 0 10px -3px rgba(124, 58, 237, 0.3)',
-        'inner-glow': 'inset 0 1px 0 0 rgba(255, 255, 255, 0.05)',
+        'glow': '0 8px 30px rgba(224, 83, 60, 0.35)',
+        'glow-lg': '0 12px 40px rgba(224, 83, 60, 0.45)',
+        'glow-sm': '0 4px 20px rgba(224, 83, 60, 0.25)',
+        'ochre-glow': '0 4px 20px rgba(245, 158, 11, 0.25)',
+        'inner-warm': 'inset 0 1px 0 0 rgba(255, 255, 255, 0.04)',
+      },
+      spacing: {
+        'margin': '2.5rem',
+        'gutter': '2rem',
+        'space-xs': '0.35rem',
+        'space-sm': '0.75rem',
+        'space-md': '1.25rem',
+        'space-lg': '2rem',
+        'space-xl': '3.5rem',
       },
       keyframes: {
         'fade-in': {
@@ -72,15 +91,15 @@ export default {
           '50%': { transform: 'translateY(-12px)' },
         },
         'pulse-glow': {
-          '0%, 100%': { boxShadow: '0 0 20px -5px rgba(124, 58, 237, 0.3)' },
-          '50%': { boxShadow: '0 0 35px -5px rgba(124, 58, 237, 0.55)' },
+          '0%, 100%': { boxShadow: '0 4px 20px rgba(224, 83, 60, 0.25)' },
+          '50%': { boxShadow: '0 8px 35px rgba(224, 83, 60, 0.50)' },
         },
         'spin-slow': {
           '0%': { transform: 'rotate(0deg)' },
           '100%': { transform: 'rotate(360deg)' },
         },
         'scale-in': {
-          '0%': { opacity: '0', transform: 'scale(0.9)' },
+          '0%': { opacity: '0', transform: 'scale(0.95)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
         },
         'toast-in': {

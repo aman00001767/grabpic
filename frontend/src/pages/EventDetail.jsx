@@ -8,6 +8,7 @@ import PhotoGrid from '../components/PhotoGrid.jsx';
 import SkeletonCard from '../components/SkeletonCard.jsx';
 import EmptyState from '../components/EmptyState.jsx';
 import LoadingSpinner from '../components/LoadingSpinner.jsx';
+import GoogleDriveUpload, { GoogleDriveIcon } from '../components/GoogleDriveUpload.jsx';
 import { useToast } from '../components/Toast.jsx';
 import { fetchEvent, fetchEventPhotos, createShareLink } from '../services/events';
 import { uploadEventPhotos, findMe } from '../services/uploads';
@@ -22,6 +23,7 @@ export default function EventDetail() {
   const [loadingEvent, setLoadingEvent] = useState(true);
   const [loadingPhotos, setLoadingPhotos] = useState(true);
 
+  const [uploadSource, setUploadSource] = useState('local'); // 'local' | 'drive'
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
@@ -51,7 +53,6 @@ export default function EventDetail() {
       const data = await fetchEventPhotos(id);
       setPhotos(data);
     } catch {
-      /* photos endpoint might not exist yet */
       setPhotos([]);
     } finally {
       setLoadingPhotos(false);
@@ -80,8 +81,15 @@ export default function EventDetail() {
     }
   };
 
+  const handleDriveSuccess = (result) => {
+    const count = result?.count || result?.uploaded?.length || 0;
+    toast.success(`Successfully imported ${count} photo${count !== 1 ? 's' : ''} from Google Drive!`);
+    loadPhotos();
+    loadEvent();
+    setTab('gallery');
+  };
+
   const handleSelfie = async (fileOrFiles) => {
-    // Accept either a single File (from SelfieInput) or a FileList/array
     const file = fileOrFiles instanceof File ? fileOrFiles : fileOrFiles?.[0];
     if (!file) return;
     setSearching(true);
@@ -155,29 +163,29 @@ export default function EventDetail() {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-espresso">
       <Navbar user={user} />
 
-      <div className="max-w-6xl mx-auto px-5 py-8">
+      <div className="max-w-7xl mx-auto px-5 py-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 animate-fade-in">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6 animate-fade-in border-b border-outline-variant pb-5">
           <div>
-            <Link to="/dashboard" className="text-sm text-surface-500 hover:text-brand-400 transition-colors">
+            <Link to="/dashboard" className="font-space text-[11px] tracking-widest uppercase text-muted hover:text-terracotta transition-colors">
               ← Back to events
             </Link>
-            <h2 className="text-xl font-semibold mt-1">
-              {loadingEvent ? <span className="skeleton inline-block h-6 w-48" /> : event?.title || 'Event'}
+            <h2 className="font-display text-3xl text-sand mt-1">
+              {loadingEvent ? <span className="skeleton inline-block h-8 w-48" /> : event?.title || 'Event'}
             </h2>
             {event?.description && (
-              <p className="text-sm text-surface-400 mt-0.5">{event.description}</p>
+              <p className="text-sm text-on-surface-variant mt-1 font-sans">{event.description}</p>
             )}
           </div>
 
-          <div className="flex items-center gap-2">
-            <button className="btn-secondary text-xs" onClick={handleShare} disabled={sharingLoading}>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button className="btn-secondary text-[11px] flex items-center gap-1.5" onClick={handleShare} disabled={sharingLoading}>
               {sharingLoading ? (
                 <span className="flex items-center gap-1.5">
-                  <span className="w-3 h-3 border-2 border-surface-500/30 border-t-surface-400 rounded-full animate-spin" />
+                  <span className="w-3 h-3 border-2 border-muted/30 border-t-muted rounded-full animate-spin" />
                   Sharing...
                 </span>
               ) : (
@@ -199,48 +207,48 @@ export default function EventDetail() {
             onClick={() => setShowQR(false)}
           >
             {/* Backdrop */}
-            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
 
             {/* Modal */}
             <div
-              className="relative glass-card p-8 max-w-sm w-full text-center animate-scale-in"
+              className="relative editorial-card p-8 max-w-sm w-full text-center animate-scale-in border-l-4 border-terracotta"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Close button */}
               <button
-                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-surface-800/60 flex items-center justify-center hover:bg-surface-700/60 transition-colors"
+                className="absolute top-3 right-3 w-8 h-8 border border-outline-variant bg-surface-container flex items-center justify-center hover:border-terracotta transition-colors"
                 onClick={() => setShowQR(false)}
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <svg className="w-4 h-4 text-muted" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                 </svg>
               </button>
 
-              <h3 className="text-lg font-semibold mb-1">Share Event</h3>
-              <p className="text-sm text-surface-400 mb-5">
-                Scan this QR code to find your photos from <span className="text-brand-300 font-medium">{event?.title}</span>
+              <p className="archival-text text-ochre mb-1">Share Event</p>
+              <h3 className="font-display text-xl text-sand mb-1">Scan to Find Photos</h3>
+              <p className="text-sm text-on-surface-variant mb-5 font-sans">
+                From <span className="text-terracotta font-medium">{event?.title}</span>
               </p>
 
               {/* QR Code */}
-              <div className="inline-block p-4 bg-white rounded-2xl shadow-lg mb-5">
+              <div className="inline-block p-4 bg-white mb-5">
                 <QRCodeSVG
                   id="share-qr-code"
                   value={shareUrl}
                   size={200}
                   level="H"
                   includeMargin={false}
-                  fgColor="#1a1a2e"
+                  fgColor="#120d0a"
                   bgColor="#ffffff"
                 />
               </div>
 
               {/* Share link */}
-              <div className="flex items-center gap-2 mb-4 bg-surface-800/60 rounded-lg p-2">
-                <code className="text-xs text-brand-300 flex-1 overflow-x-auto text-left whitespace-nowrap">
+              <div className="flex items-center gap-2 mb-4 bg-surface-container border border-outline-variant p-2">
+                <code className="font-space text-xs text-terracotta flex-1 overflow-x-auto text-left whitespace-nowrap tracking-wide">
                   {shareUrl}
                 </code>
                 <button
-                  className="btn-secondary text-xs py-1.5 px-3 flex-shrink-0"
+                  className="btn-secondary text-[10px] py-1.5 px-3 flex-shrink-0"
                   onClick={handleCopyLink}
                 >
                   Copy
@@ -249,7 +257,7 @@ export default function EventDetail() {
 
               {/* Action buttons */}
               <div className="flex gap-2">
-                <button className="btn-secondary text-xs flex-1" onClick={handleDownloadQR}>
+                <button className="btn-secondary text-[10px] flex-1" onClick={handleDownloadQR}>
                   <span className="flex items-center justify-center gap-1.5">
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
@@ -257,7 +265,7 @@ export default function EventDetail() {
                     Download QR
                   </span>
                 </button>
-                <button className="btn-primary text-xs flex-1" onClick={handleCopyLink}>
+                <button className="btn-primary text-[10px] flex-1" onClick={handleCopyLink}>
                   <span className="flex items-center justify-center gap-1.5">
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m9.86-3.064a4.5 4.5 0 0 0-1.242-7.244l-4.5-4.5a4.5 4.5 0 0 0-6.364 6.364l1.757 1.757" />
@@ -271,20 +279,20 @@ export default function EventDetail() {
         )}
 
         {/* Tabs */}
-        <div className="flex gap-1 bg-surface-900/60 border border-surface-800/50 rounded-xl p-1 mb-6 overflow-x-auto">
+        <div className="flex gap-0 border border-outline-variant mb-6 overflow-x-auto">
           {tabs.map((t) => (
             <button
               key={t.key}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 ${
+              className={`flex items-center gap-1.5 px-5 py-3 font-space text-xs tracking-widest uppercase font-semibold whitespace-nowrap transition-all duration-200 border-r border-outline-variant last:border-r-0 ${
                 tab === t.key
-                  ? 'bg-brand-500/15 text-brand-300 shadow-sm'
-                  : 'text-surface-400 hover:text-surface-200'
+                  ? 'bg-terracotta text-white'
+                  : 'text-muted hover:text-sand hover:bg-surface-container'
               }`}
               onClick={() => setTab(t.key)}
             >
               {t.label}
               {t.count != null && t.count > 0 && (
-                <span className="text-xs px-1.5 py-0.5 rounded-full bg-brand-500/20 text-brand-400">
+                <span className={`text-[10px] px-1.5 py-0.5 font-space font-bold ${tab === t.key ? 'bg-white/20 text-white' : 'bg-ochre/20 text-ochre'}`}>
                   {t.count}
                 </span>
               )}
@@ -316,18 +324,61 @@ export default function EventDetail() {
           )}
 
           {tab === 'upload' && (
-            <div className="max-w-xl mx-auto">
-              <UploadZone
-                onFiles={handleUpload}
-                uploading={uploading}
-                progress={uploadProgress}
-                label="Upload Event Photos"
-                sublabel="Drag & drop images or click to browse (JPEG, PNG, WebP)"
-                icon="photo"
-              />
-              <p className="text-xs text-surface-500 text-center mt-3">
-                Photos are processed with AI to extract face embeddings for search.
-              </p>
+            <div className="max-w-xl mx-auto space-y-6">
+              {/* Upload source selector */}
+              <div className="flex items-center justify-center">
+                <div className="inline-flex p-1 bg-surface-container border border-outline-variant">
+                  <button
+                    type="button"
+                    onClick={() => setUploadSource('local')}
+                    className={`flex items-center gap-2 px-4 py-2 font-space text-xs uppercase tracking-wider transition-colors ${
+                      uploadSource === 'local'
+                        ? 'bg-surface text-sand shadow-sm border border-outline-variant font-semibold'
+                        : 'text-muted hover:text-sand'
+                    }`}
+                  >
+                    <svg className="w-4 h-4 text-terracotta" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+                    </svg>
+                    <span>Local Files</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setUploadSource('drive')}
+                    className={`flex items-center gap-2 px-4 py-2 font-space text-xs uppercase tracking-wider transition-colors ${
+                      uploadSource === 'drive'
+                        ? 'bg-surface text-sand shadow-sm border border-outline-variant font-semibold'
+                        : 'text-muted hover:text-sand'
+                    }`}
+                  >
+                    <GoogleDriveIcon className="w-4 h-4" />
+                    <span>Google Drive</span>
+                  </button>
+                </div>
+              </div>
+
+              {uploadSource === 'local' ? (
+                <>
+                  <UploadZone
+                    onFiles={handleUpload}
+                    uploading={uploading}
+                    progress={uploadProgress}
+                    label="Upload Event Photos"
+                    sublabel="Drag & drop images or click to browse (JPEG, PNG, WebP)"
+                    icon="photo"
+                    onDriveClick={() => setUploadSource('drive')}
+                  />
+                  <p className="font-space text-[11px] tracking-wide text-muted text-center mt-3 uppercase">
+                    Photos are processed with AI to extract face embeddings for search.
+                  </p>
+                </>
+              ) : (
+                <GoogleDriveUpload
+                  eventId={id}
+                  onUploadSuccess={handleDriveSuccess}
+                  onCancel={() => setUploadSource('local')}
+                />
+              )}
             </div>
           )}
 

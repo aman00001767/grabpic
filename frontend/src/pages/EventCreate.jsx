@@ -26,14 +26,19 @@ export default function EventCreate() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-espresso">
       <Navbar user={user} />
-      <div className="max-w-2xl mx-auto px-5 py-8">
-        <h2 className="text-xl font-semibold mb-6">Create Event</h2>
-        <div className="glass-card p-6 animate-fade-in">
+      <div className="max-w-2xl mx-auto px-5 py-10">
+        {/* Header */}
+        <div className="mb-8 border-b border-outline-variant pb-5">
+          <p className="archival-text text-ochre mb-1">New Entry</p>
+          <h2 className="font-display text-3xl text-sand">Create Event</h2>
+        </div>
+
+        <div className="editorial-card p-6 animate-fade-in">
           <form onSubmit={submit} className="space-y-5">
             <div>
-              <label className="block text-xs font-medium text-surface-400 mb-1.5">Event Title</label>
+              <label className="block font-space text-[10px] tracking-widest uppercase text-muted-deep mb-1.5">Event Title</label>
               <input
                 className="input-field"
                 placeholder="e.g. Sarah's Wedding"
@@ -43,7 +48,7 @@ export default function EventCreate() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-surface-400 mb-1.5">Description</label>
+              <label className="block font-space text-[10px] tracking-widest uppercase text-muted-deep mb-1.5">Description</label>
               <textarea
                 className="input-field resize-none"
                 placeholder="Optional description for your event"
@@ -52,7 +57,7 @@ export default function EventCreate() {
                 rows={4}
               />
             </div>
-            <button className="btn-primary w-full py-3" disabled={loading}>
+            <button className="btn-primary w-full py-3 justify-center" disabled={loading}>
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
                   <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

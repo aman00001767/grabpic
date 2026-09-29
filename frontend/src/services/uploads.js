@@ -31,3 +31,9 @@ export async function findMePublic(token, file) {
   });
   return data;
 }
+
+export async function uploadFromDrive(eventId, payload) {
+  const { data } = await api.post(`/upload-from-drive/${eventId}`, payload);
+  return data;
+}
+

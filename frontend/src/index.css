@@ -5,7 +5,8 @@
 @layer base {
   :root {
     color-scheme: dark;
-    --brand-rgb: 124, 58, 237;
+    --terracotta-rgb: 224, 83, 60;
+    --ochre-rgb: 245, 158, 11;
   }
 
   html {
@@ -14,17 +15,19 @@
 
   body {
     overflow-x: hidden;
+    background-color: #120d0a;
+    color: #fdf8f0;
   }
 
   ::selection {
-    background-color: rgba(124, 58, 237, 0.3);
-    color: #f8fafc;
+    background-color: rgba(224, 83, 60, 0.35);
+    color: #fdf8f0;
   }
 
-  /* Scrollbar */
+  /* Scrollbar — warm toned */
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
   }
 
   ::-webkit-scrollbar-track {
@@ -32,92 +35,108 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.2);
+    background: rgba(109, 82, 66, 0.4);
     border-radius: 9999px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(148, 163, 184, 0.35);
+    background: rgba(224, 83, 60, 0.4);
   }
 
-  /* Reset inputs to match dark theme */
+  /* Reset inputs to match dark warm theme */
   input,
   textarea,
   select {
-    @apply bg-surface-800 border-surface-700 text-surface-100 placeholder-surface-500;
+    @apply bg-surface-container border-outline-variant text-on-surface placeholder-muted-deep;
   }
 
   input:focus,
   textarea:focus,
   select:focus {
-    @apply outline-none ring-2 ring-brand-500/40 border-brand-500/50;
+    @apply outline-none ring-2 ring-terracotta/30 border-terracotta/50;
   }
 }
 
 @layer components {
-  /* Glassmorphism cards */
-  .glass-card {
-    @apply bg-surface-900/60 border border-surface-700/50 rounded-2xl backdrop-blur-xl shadow-inner-glow;
+  /* ── Editorial surface cards — rectangular, film-esque ── */
+  .editorial-card {
+    @apply bg-surface border border-outline-variant shadow-inner-warm;
   }
 
-  .glass-card-hover {
-    @apply glass-card transition-all duration-300;
+  .editorial-card-hover {
+    @apply editorial-card transition-all duration-300;
   }
 
-  .glass-card-hover:hover {
-    @apply border-brand-500/30 shadow-glow-sm bg-surface-900/80;
+  .editorial-card-hover:hover {
+    @apply border-terracotta/30 shadow-glow-sm;
     transform: translateY(-2px);
   }
 
-  /* Gradient text */
-  .gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-400 via-brand-300 to-purple-300;
+  /* Legacy aliases so existing JSX still compiles */
+  .glass-card {
+    @apply editorial-card;
   }
 
-  /* Primary button */
+  .glass-card-hover {
+    @apply editorial-card-hover;
+  }
+
+  /* ── Display text (DM Serif Display) ── */
+  .text-display {
+    @apply font-display;
+  }
+
+  /* ── Gradient text — terracotta to ochre ── */
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #f87157, #e0533c 40%, #f59e0b);
+  }
+
+  /* ── Primary button — terracotta fill, uppercase Space Grotesk ── */
   .btn-primary {
-    @apply px-5 py-2.5 rounded-xl font-medium text-sm
-           bg-gradient-to-r from-brand-600 to-brand-500
-           hover:from-brand-500 hover:to-brand-400
-           shadow-glow-sm hover:shadow-glow
+    @apply px-6 py-2.5 font-space font-semibold text-xs tracking-widest uppercase
+           bg-terracotta text-white
+           hover:bg-terracotta-container
+           shadow-glow hover:shadow-glow-lg
+           border border-terracotta-fixed/30
            transition-all duration-300
            active:scale-[0.97]
            disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none;
   }
 
-  /* Secondary / ghost button */
+  /* ── Secondary / ghost button — outlined, ochre hover ── */
   .btn-secondary {
-    @apply px-5 py-2.5 rounded-xl font-medium text-sm
-           bg-surface-800/80 border border-surface-700/60 text-surface-200
-           hover:bg-surface-700/80 hover:border-surface-600
+    @apply px-5 py-2.5 font-space font-semibold text-xs tracking-widest uppercase
+           bg-surface-container border border-outline-variant text-on-surface-variant
+           hover:border-ochre hover:text-ochre
            transition-all duration-300
            active:scale-[0.97];
   }
 
-  /* Danger button */
+  /* ── Danger button ── */
   .btn-danger {
-    @apply px-4 py-2 rounded-xl font-medium text-sm
+    @apply px-4 py-2 font-space font-medium text-xs tracking-wide uppercase
            text-red-400 border border-red-500/20
            hover:bg-red-500/10 hover:border-red-500/40
            transition-all duration-300;
   }
 
-  /* Input field */
+  /* ── Input field — warm dark bg ── */
   .input-field {
-    @apply w-full px-4 py-3 rounded-xl
-           bg-surface-800/60 border border-surface-700/60
-           text-surface-100 placeholder-surface-500
-           focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500/50
+    @apply w-full px-4 py-3
+           bg-surface-container border border-outline-variant
+           text-on-surface placeholder-muted-deep
+           focus:ring-2 focus:ring-terracotta/30 focus:border-terracotta/50
            transition-all duration-200;
   }
 
-  /* Skeleton shimmer */
+  /* ── Skeleton shimmer — warm tones ── */
   .skeleton {
-    @apply bg-gradient-to-r from-surface-800 via-surface-700/60 to-surface-800
-           bg-[length:200%_100%] animate-shimmer rounded-xl;
+    @apply bg-gradient-to-r from-surface-container via-surface-container-high to-surface-container
+           bg-[length:200%_100%] animate-shimmer;
   }
 
-  /* Hero background glow */
+  /* ── Hero background glow — terracotta tinted ── */
   .hero-glow {
     position: relative;
   }
@@ -132,21 +151,31 @@
     height: 80%;
     background: radial-gradient(
       ellipse 60% 50% at 50% 50%,
-      rgba(124, 58, 237, 0.12),
-      rgba(124, 58, 237, 0.04) 40%,
+      rgba(224, 83, 60, 0.08),
+      rgba(224, 83, 60, 0.03) 40%,
       transparent 70%
     );
     pointer-events: none;
     z-index: 0;
   }
 
-  /* Progress bar fill animation */
-  .progress-fill {
-    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    @apply bg-gradient-to-r from-brand-600 to-brand-400;
+  /* ── Archival running line — editorial top bar text style ── */
+  .archival-text {
+    @apply font-space text-[10px] tracking-[0.25em] uppercase text-muted-deep;
   }
 
-  /* Stagger animation delay utilities */
+  /* ── Progress bar ── */
+  .progress-fill {
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    @apply bg-gradient-to-r from-terracotta-container to-terracotta;
+  }
+
+  /* ── Underline accent — editorial rule ── */
+  .rule-terracotta {
+    @apply border-b-2 border-terracotta;
+  }
+
+  /* ── Stagger animation delay utilities ── */
   .stagger-1 { animation-delay: 0.05s; }
   .stagger-2 { animation-delay: 0.1s; }
   .stagger-3 { animation-delay: 0.15s; }

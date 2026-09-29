@@ -1,4 +1,5 @@
 import React, { useRef, useState, useCallback } from 'react';
+import GoogleDriveIcon from './GoogleDriveIcon';
 
 export default function UploadZone({
   onFiles,
@@ -9,6 +10,7 @@ export default function UploadZone({
   label = 'Upload Photos',
   sublabel = 'Drag & drop or click to browse',
   icon = 'photo',
+  onDriveClick = null,
 }) {
   const inputRef = useRef(null);
   const [dragOver, setDragOver] = useState(false);
@@ -59,12 +61,12 @@ export default function UploadZone({
   return (
     <div
       className={`
-        relative rounded-2xl border-2 border-dashed p-8
+        relative border-2 border-dashed p-8
         flex flex-col items-center justify-center gap-3
         cursor-pointer transition-all duration-300
         ${dragOver
-          ? 'border-brand-400 bg-brand-500/10 scale-[1.01]'
-          : 'border-surface-700/60 hover:border-brand-500/40 hover:bg-surface-800/40'
+          ? 'border-terracotta bg-terracotta/8 scale-[1.01]'
+          : 'border-outline-variant hover:border-terracotta/50 hover:bg-surface-container'
         }
         ${uploading ? 'pointer-events-none opacity-70' : ''}
       `}
@@ -82,27 +84,45 @@ export default function UploadZone({
         onChange={(e) => handleFiles(e.target.files)}
       />
 
-      <div className={`text-surface-500 transition-colors duration-300 ${dragOver ? 'text-brand-400' : ''}`}>
+      <div className={`transition-colors duration-300 ${dragOver ? 'text-terracotta' : 'text-muted'}`}>
         {icons[icon] || icons.photo}
       </div>
 
       <div className="text-center">
-        <p className="font-medium text-surface-200">{label}</p>
-        <p className="text-sm text-surface-500 mt-0.5">{sublabel}</p>
+        <p className="font-space font-semibold text-sm tracking-wide text-sand">{label}</p>
+        <p className="font-sans text-sm text-on-surface-variant mt-0.5">{sublabel}</p>
       </div>
 
       {fileCount > 0 && !uploading && (
-        <p className="text-xs text-brand-400 mt-1">{fileCount} file{fileCount > 1 ? 's' : ''} selected</p>
+        <p className="font-space text-xs tracking-widest uppercase text-terracotta mt-1">
+          {fileCount} file{fileCount > 1 ? 's' : ''} selected
+        </p>
+      )}
+
+      {onDriveClick && !uploading && (
+        <div className="pt-2">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDriveClick();
+            }}
+            className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-space border border-outline-variant bg-surface hover:border-terracotta text-sand hover:text-white transition-colors"
+          >
+            <GoogleDriveIcon className="w-4 h-4" />
+            <span>Or import from Google Drive</span>
+          </button>
+        </div>
       )}
 
       {uploading && (
         <div className="w-full max-w-xs mt-3">
-          <div className="flex items-center justify-between text-xs text-surface-400 mb-1.5">
+          <div className="flex items-center justify-between font-space text-[11px] uppercase tracking-widest text-muted mb-1.5">
             <span>Uploading...</span>
             <span>{progress}%</span>
           </div>
-          <div className="h-1.5 bg-surface-800 rounded-full overflow-hidden">
-            <div className="progress-fill h-full rounded-full" style={{ width: `${progress}%` }} />
+          <div className="h-1 bg-surface-container-high overflow-hidden">
+            <div className="progress-fill h-full" style={{ width: `${progress}%` }} />
           </div>
         </div>
       )}

@@ -5,7 +5,7 @@ import asyncio
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from ..auth import get_current_user
 from .. import db
-from ..face_engine import get_single_embedding, load_image
+from ..face_engine import get_single_embedding_tta, load_image
 from ..s3 import extract_key_from_url, get_presigned_url
 
 router = APIRouter()
@@ -76,7 +76,7 @@ async def find_me(
     temp_path = _save_temp(file)
     try:
         img = await asyncio.to_thread(_load_image, temp_path)
-        face = await asyncio.to_thread(get_single_embedding, img)
+        face = await asyncio.to_thread(get_single_embedding_tta, img)
         if not face:
             raise HTTPException(status_code=400, detail='No face detected in the uploaded image')
 
@@ -110,7 +110,7 @@ async def find_me_public(
     temp_path = _save_temp(file)
     try:
         img = await asyncio.to_thread(_load_image, temp_path)
-        face = await asyncio.to_thread(get_single_embedding, img)
+        face = await asyncio.to_thread(get_single_embedding_tta, img)
         if not face:
             raise HTTPException(status_code=400, detail='No face detected in the uploaded image')
 

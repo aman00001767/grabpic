@@ -14,7 +14,7 @@ export default function PhotoGrid({ photos = [], showDistance = false, onSelect,
   const handleDownload = async (e, photo) => {
     e.stopPropagation();
     const photoId = photo.photo_id || photo.id;
-    const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    const apiBase = import.meta.env.API_URL || 'http://localhost:8000';
     try {
       const res = await fetch(`${apiBase}/photos/${photoId}/download`);
       if (!res.ok) throw new Error('proxy failed');

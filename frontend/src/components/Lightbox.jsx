@@ -32,7 +32,7 @@ export default function Lightbox({ images, initialIndex = 0, onClose }) {
 
   const handleDownload = async () => {
     if (!current) return;
-    const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    const apiBase = import.meta.env.API_URL || 'http://localhost:8000';
     try {
       // Use backend proxy to bypass S3 CORS restrictions
       const res = await fetch(`${apiBase}/photos/${current.photoId}/download`);

@@ -4,7 +4,7 @@ import { login, register, googleAuth, forgotPassword } from '../services/auth';
 
 // ── Replace with your actual Google OAuth Client ID ──────────────────────────
 // Create one at: https://console.cloud.google.com → APIs & Services → Credentials
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+const GOOGLE_CLIENT_ID = import.meta.env.GOOGLE_CLIENT_ID ||'';
 
 const isAuthed = () => Boolean(localStorage.getItem('token'));
 
@@ -261,7 +261,7 @@ export default function LoginRegister() {
                 <button
                   type="button"
                   className="w-full flex items-center justify-center gap-3 py-2.5 px-4 border border-outline-variant bg-surface hover:border-terracotta/50 transition-colors duration-200 font-space text-xs tracking-wide text-sand"
-                  onClick={() => setError('Set VITE_GOOGLE_CLIENT_ID in your .env to enable Google sign-in.')}
+                  onClick={() => setError('Set GOOGLE_CLIENT_ID in your .env to enable Google sign-in.')}
                 >
                   <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>

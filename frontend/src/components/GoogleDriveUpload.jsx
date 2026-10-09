@@ -4,7 +4,7 @@ import LoadingSpinner from './LoadingSpinner';
 import GoogleDriveIcon from './GoogleDriveIcon';
 
 export { GoogleDriveIcon };
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+const GOOGLE_CLIENT_ID = import.meta.env.GOOGLE_CLIENT_ID || '';
 
 export default function GoogleDriveUpload({ eventId, onUploadSuccess, onCancel }) {
   const [driveUrl, setDriveUrl] = useState('');
@@ -54,7 +54,7 @@ export default function GoogleDriveUpload({ eventId, onUploadSuccess, onCancel }
 
     if (!GOOGLE_CLIENT_ID) {
       setError(
-        'Google Client ID is not configured (VITE_GOOGLE_CLIENT_ID). You can import directly by pasting your Google Drive folder or photo link below!'
+        'Google Client ID is not configured (GOOGLE_CLIENT_ID). You can import directly by pasting your Google Drive folder or photo link below!'
       );
       return;
     }

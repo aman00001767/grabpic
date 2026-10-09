@@ -146,6 +146,9 @@ export default function LoginRegister() {
 
     if (googleBtnRef.current) {
       googleBtnRef.current.innerHTML = '';
+      const measuredWidth = Math.floor(googleBtnRef.current.clientWidth || 340);
+      const btnWidth = Math.min(Math.max(measuredWidth, 200), 400);
+
       window.google.accounts.id.renderButton(googleBtnRef.current, {
         type: 'standard',
         shape: 'rectangular',
@@ -153,7 +156,7 @@ export default function LoginRegister() {
         text: 'continue_with',
         size: 'large',
         logo_alignment: 'left',
-        width: googleBtnRef.current.offsetWidth || 340,
+        width: btnWidth,
       });
     }
   }, [mode, authed]); // re-render button when tab switches
@@ -254,8 +257,8 @@ export default function LoginRegister() {
                   <div
                     ref={googleBtnRef}
                     id="google-signin-btn"
-                    className="w-full overflow-hidden"
-                    style={{ minHeight: 44 }}
+                    className="w-full overflow-hidden flex justify-center"
+                    style={{ minHeight: 44, colorScheme: 'light' }}
                   />
                   {googleLoading && (
                     <div className="absolute inset-0 flex items-center justify-center bg-espresso/70 rounded">

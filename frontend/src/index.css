@@ -55,6 +55,12 @@
   select:focus {
     @apply outline-none ring-2 ring-terracotta/30 border-terracotta/50;
   }
+
+  /* Prevent browser color-scheme inversion glitch on Google Sign-In iframe */
+  #google-signin-btn,
+  #google-signin-btn * {
+    color-scheme: light !important;
+  }
 }
 
 @layer components {

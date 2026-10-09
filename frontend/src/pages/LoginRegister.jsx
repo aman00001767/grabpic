@@ -131,15 +131,21 @@ export default function LoginRegister() {
   const authed = isAuthed();
 
   // ── Google Identity Services init ──────────────────────────────────────────
+  const initializedRef = useRef(false);
+
   useEffect(() => {
     if (authed || !GOOGLE_CLIENT_ID || !window.google) return;
 
-    window.google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-      callback: handleGoogleCredential,
-    });
+    if (!initializedRef.current) {
+      window.google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleGoogleCredential,
+      });
+      initializedRef.current = true;
+    }
 
     if (googleBtnRef.current) {
+      googleBtnRef.current.innerHTML = '';
       window.google.accounts.id.renderButton(googleBtnRef.current, {
         type: 'standard',
         shape: 'rectangular',

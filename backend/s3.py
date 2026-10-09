@@ -34,7 +34,7 @@ def _get_client():
 def upload_file(file_path: str, key: str) -> str:
     s3 = _get_client()
     aws_s3_bucket = os.getenv('AWS_S3_BUCKET')
-    aws_region = os.getenv('AWS_REGION', 'us-east-1')
+    aws_region = os.getenv('AWS_REGION', 'ap-southeast-2')
     s3.upload_file(file_path, aws_s3_bucket, key)
     return f"https://{aws_s3_bucket}.s3.{aws_region}.amazonaws.com/{key}"
 

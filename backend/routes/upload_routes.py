@@ -51,7 +51,8 @@ async def _process_and_save_photo(event_id: int, file_path: str, original_filena
     except Exception as exc:
         if os.path.exists(file_path):
             os.remove(file_path)
-        raise HTTPException(status_code=500, detail=f"S3 upload failed: {exc}") from exc
+        logger.error('S3 upload failed for event %s: %s', event_id, exc)
+        raise HTTPException(status_code=500, detail='Photo upload failed. Please try again later.') from exc
 
     photo = db.execute(
         'INSERT INTO photos (event_id, image_url) VALUES (%s, %s) RETURNING id, image_url',

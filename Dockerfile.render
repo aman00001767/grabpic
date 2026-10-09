@@ -1,0 +1,21 @@
+FROM python:3.12-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY backend/requirements.txt ./backend/requirements.txt
+RUN pip install --no-cache-dir -r backend/requirements.txt
+
+# Pre-download buffalo_sc at build time (avoids cold-start delay)
+RUN python -c "from insightface.app import FaceAnalysis; FaceAnalysis(name='buffalo_sc').prepare(ctx_id=-1, det_size=(640,640))"
+
+COPY backend/ ./backend/
+
+RUN mkdir -p ./backend/temp_uploads
+
+EXPOSE $PORT
+
+CMD ["sh", "-c", "uvicorn backend.app:app --host 0.0.0.0 --port $PORT --workers 1"]

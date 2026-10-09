@@ -42,7 +42,7 @@ COPY --from=frontend-build /app/frontend/dist ./backend/static
 RUN mkdir -p ./backend/temp_uploads
 
 # Pre-download the InsightFace buffalo_l model so first request isn't slow
-RUN python -c "from insightface.app import FaceAnalysis; app = FaceAnalysis(name='buffalo_l'); print('Model downloaded')"
+RUN python -c "from insightface.app import FaceAnalysis; app = FaceAnalysis(name='buffalo_sc'); print('Model downloaded')"
 
 # Expose the API port
 EXPOSE 8000

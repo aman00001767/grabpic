@@ -128,12 +128,11 @@ export default function LoginRegister() {
   const [error, setError] = useState('');
   const [showForgot, setShowForgot] = useState(false);
   const googleBtnRef = useRef(null);
-
-  if (isAuthed()) return <Navigate to="/dashboard" replace />;
+  const authed = isAuthed();
 
   // ── Google Identity Services init ──────────────────────────────────────────
   useEffect(() => {
-    if (!GOOGLE_CLIENT_ID || !window.google) return;
+    if (authed || !GOOGLE_CLIENT_ID || !window.google) return;
 
     window.google.accounts.id.initialize({
       client_id: GOOGLE_CLIENT_ID,
@@ -151,7 +150,10 @@ export default function LoginRegister() {
         width: googleBtnRef.current.offsetWidth || 340,
       });
     }
-  }, [mode]); // re-render button when tab switches
+  }, [mode, authed]); // re-render button when tab switches
+
+  // Must be after all hooks
+  if (authed) return <Navigate to="/dashboard" replace />;
 
   const handleGoogleCredential = async (response) => {
     setError('');

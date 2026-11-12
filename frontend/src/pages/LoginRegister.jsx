@@ -5,6 +5,7 @@ import { login, register, googleAuth, forgotPassword } from '../services/auth';
 // ── Replace with your actual Google OAuth Client ID ──────────────────────────
 // Create one at: https://console.cloud.google.com → APIs & Services → Credentials
 const GOOGLE_CLIENT_ID = import.meta.env.GOOGLE_CLIENT_ID || '';
+const API_URL = import.meta.env.API_URL || 'http://localhost:8000';
 
 const isAuthed = () => Boolean(localStorage.getItem('token'));
 
@@ -127,57 +128,91 @@ export default function LoginRegister() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState('');
   const [showForgot, setShowForgot] = useState(false);
-  const googleBtnRef = useRef(null);
   const authed = isAuthed();
 
-  // ── Google Identity Services init ──────────────────────────────────────────
-  const initializedRef = useRef(false);
-
+  // ── Handle OAuth redirect callbacks (Immune to ad blockers) ─────────────────
   useEffect(() => {
-    if (authed || !GOOGLE_CLIENT_ID || !window.google) return;
+    // 1. Check URL query parameters (from Authorization Code redirect)
+    const urlParams = new URLSearchParams(window.location.search);
+    const oauthToken = urlParams.get('token');
+    const oauthError = urlParams.get('error');
 
-    if (!initializedRef.current) {
-      window.google.accounts.id.initialize({
+    if (oauthError) {
+      setError(decodeURIComponent(oauthError));
+      window.history.replaceState(null, '', window.location.pathname);
+      return;
+    }
+
+    if (oauthToken) {
+      setGoogleLoading(true);
+      const name = decodeURIComponent(urlParams.get('name') || '');
+      const email = decodeURIComponent(urlParams.get('email') || '');
+      const user = { name, email };
+      localStorage.setItem('token', oauthToken);
+      localStorage.setItem('user', JSON.stringify(user));
+      window.history.replaceState(null, '', window.location.pathname);
+      navigate('/dashboard');
+      return;
+    }
+
+    // 2. Check URL hash parameters (from direct OIDC id_token redirect)
+    if (window.location.hash) {
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const idToken = hashParams.get('id_token');
+      const hashError = hashParams.get('error_description') || hashParams.get('error');
+
+      if (hashError) {
+        setError(decodeURIComponent(hashError));
+        window.history.replaceState(null, '', window.location.pathname);
+        return;
+      }
+
+      if (idToken) {
+        setGoogleLoading(true);
+        window.history.replaceState(null, '', window.location.pathname);
+        googleAuth(idToken)
+          .then((data) => {
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            navigate('/dashboard');
+          })
+          .catch((err) => {
+            setError(err?.response?.data?.detail || 'Google sign-in failed. Please try again.');
+          })
+          .finally(() => {
+            setGoogleLoading(false);
+          });
+      }
+    }
+  }, [navigate]);
+
+  const handleGoogleLogin = () => {
+    setError('');
+    setGoogleLoading(true);
+
+    if (GOOGLE_CLIENT_ID) {
+      // Direct full-page redirect to Google (100% immune to ad blockers)
+      const rootUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
+      const redirectUri = `${window.location.origin}/login`;
+      const nonce = Math.random().toString(36).substring(2);
+      const params = new URLSearchParams({
         client_id: GOOGLE_CLIENT_ID,
-        callback: handleGoogleCredential,
+        redirect_uri: redirectUri,
+        response_type: 'id_token',
+        scope: 'openid email profile',
+        prompt: 'select_account',
+        nonce: nonce,
       });
-      initializedRef.current = true;
+      window.location.assign(`${rootUrl}?${params.toString()}`);
+      return;
     }
 
-    if (googleBtnRef.current) {
-      googleBtnRef.current.innerHTML = '';
-      const measuredWidth = Math.floor(googleBtnRef.current.clientWidth || 340);
-      const btnWidth = Math.min(Math.max(measuredWidth, 200), 400);
-
-      window.google.accounts.id.renderButton(googleBtnRef.current, {
-        type: 'standard',
-        shape: 'rectangular',
-        theme: 'filled_black',
-        text: 'continue_with',
-        size: 'large',
-        logo_alignment: 'left',
-        width: btnWidth,
-      });
-    }
-  }, [mode, authed]); // re-render button when tab switches
+    // Fallback: initiate via backend redirect endpoint
+    window.location.assign(`${API_URL}/auth/google/login`);
+  };
 
   // Must be after all hooks
   if (authed) return <Navigate to="/dashboard" replace />;
-
-  const handleGoogleCredential = async (response) => {
-    setError('');
-    setGoogleLoading(true);
-    try {
-      const data = await googleAuth(response.credential);
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      navigate('/dashboard');
-    } catch (err) {
-      setError(err?.response?.data?.detail || 'Google sign-in failed. Please try again.');
-    } finally {
-      setGoogleLoading(false);
-    }
-  };
 
   // ── Email/password submit ──────────────────────────────────────────────────
   const submit = async (e) => {
@@ -249,39 +284,26 @@ export default function LoginRegister() {
               ))}
             </div>
 
-            {/* ── Google Sign-In button ── */}
+            {/* ── Google Sign-In button (Full-page redirect — immune to ad blockers) ── */}
             <div className="mb-5">
-              {GOOGLE_CLIENT_ID ? (
-                <div className="relative">
-                  {/* GSI rendered button (injected by Google SDK) */}
-                  <div
-                    ref={googleBtnRef}
-                    id="google-signin-btn"
-                    className="w-full overflow-hidden flex justify-center"
-                    style={{ minHeight: 44, colorScheme: 'light' }}
-                  />
-                  {googleLoading && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-espresso/70 rounded">
-                      <span className="w-4 h-4 border-2 border-terracotta/30 border-t-terracotta rounded-full animate-spin" />
-                    </div>
-                  )}
-                </div>
-              ) : (
-                /* Placeholder shown when GOOGLE_CLIENT_ID is not yet set */
-                <button
-                  type="button"
-                  className="w-full flex items-center justify-center gap-3 py-2.5 px-4 border border-outline-variant bg-surface hover:border-terracotta/50 transition-colors duration-200 font-space text-xs tracking-wide text-sand"
-                  onClick={() => setError('Set GOOGLE_CLIENT_ID in your .env to enable Google sign-in.')}
-                >
+              <button
+                type="button"
+                onClick={handleGoogleLogin}
+                disabled={googleLoading}
+                className="w-full relative flex items-center justify-center gap-3 py-2.5 px-4 border border-outline-variant bg-surface hover:border-terracotta/50 active:scale-[0.99] transition-all duration-200 font-space text-xs tracking-wide text-sand disabled:opacity-60"
+              >
+                {googleLoading ? (
+                  <span className="w-4 h-4 border-2 border-terracotta/30 border-t-terracotta rounded-full animate-spin" />
+                ) : (
                   <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                     <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
                     <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                   </svg>
-                  Continue with Google
-                </button>
-              )}
+                )}
+                <span>{googleLoading ? 'Connecting to Google...' : 'Continue with Google'}</span>
+              </button>
             </div>
 
             {/* Divider */}

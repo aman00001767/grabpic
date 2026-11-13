@@ -5,6 +5,7 @@ import GoogleDriveIcon from './GoogleDriveIcon';
 
 export { GoogleDriveIcon };
 const GOOGLE_CLIENT_ID = import.meta.env.GOOGLE_CLIENT_ID || '';
+const GOOGLE_API_KEY = import.meta.env.GOOGLE_API_KEY || '';
 
 export default function GoogleDriveUpload({ eventId, onUploadSuccess, onCancel }) {
   const [driveUrl, setDriveUrl] = useState('');
@@ -84,11 +85,24 @@ export default function GoogleDriveUpload({ eventId, onUploadSuccess, onCancel }
               const allFilesView = new window.google.picker.DocsView(window.google.picker.ViewId.DOCS)
                 .setIncludeFolders(true);
 
-              const picker = new window.google.picker.PickerBuilder()
+              const appId = GOOGLE_CLIENT_ID ? GOOGLE_CLIENT_ID.split('-')[0] : '';
+              const origin = window.location.protocol + '//' + window.location.host;
+
+              let builder = new window.google.picker.PickerBuilder()
                 .enableFeature(window.google.picker.Feature.MULTISELECT_ENABLED)
                 .addView(imageFolderView)
                 .addView(allFilesView)
                 .setOAuthToken(accessToken)
+                .setOrigin(origin);
+
+              if (appId) {
+                builder = builder.setAppId(appId);
+              }
+              if (GOOGLE_API_KEY) {
+                builder = builder.setDeveloperKey(GOOGLE_API_KEY);
+              }
+
+              const picker = builder
                 .setCallback(async (data) => {
                   if (data.action === window.google.picker.Action.PICKED) {
                     const docs = data.docs || [];
@@ -118,7 +132,9 @@ export default function GoogleDriveUpload({ eventId, onUploadSuccess, onCancel }
               picker.setVisible(true);
             } catch (pErr) {
               console.error(pErr);
-              setError('Failed to open Google Picker. Please paste your Google Drive link below.');
+              setError(
+                'Google Picker could not load. Make sure "Google Picker API" is enabled in GCP and GOOGLE_API_KEY is set in .env. You can also paste your folder link above!'
+              );
             }
           });
         },
